@@ -2,4 +2,3 @@ __pycache__/
 bot_config.py
 *.idea
 *checkpoint/
-*data/
