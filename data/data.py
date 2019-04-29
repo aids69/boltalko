@@ -2,10 +2,10 @@ EN_WHITELIST = '0123456789abcdefghijklmnopqrstuvwxyzабвгдеёжзийклм
 EN_BLACKLIST = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~\''
 
 limit = {
-        'maxq' : 15,
-        'minq' : 2,
-        'maxa' : 15,
-        'mina' : 2
+        'maxq': 15,
+        'minq': 2,
+        'maxa': 15,
+        'mina': 2
         }
 
 UNK = 'unk'
