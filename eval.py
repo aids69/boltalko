@@ -2,8 +2,9 @@ import tensorflow as tf
 import tensorlayer as tl
 import numpy as np
 import os
-import model
 from data import data
+
+print("=======TEST.PY IMPORTED WHAT THE FUCK=======")
 
 
 metadata, idx_q, idx_a = data.load_data(PATH='data/')
@@ -13,33 +14,9 @@ idx2w = metadata['idx2w']  # list index 2 word
 
 print("Loading vocab done:", "shapes", idx_q.shape, idx_a.shape)
 
-(trainX, trainY), (testX, testY), (validX, validY) = data.split_dataset(idx_q, idx_a)
-
-trainX = trainX.tolist()
-trainY = trainY.tolist()
-testX = testX.tolist()
-testY = testY.tolist()
-validX = validX.tolist()
-validY = validY.tolist()
-
-print("Split dataset done: ", 'q=', trainX[0], 'a=', trainY[0])
-
-trainX = tl.prepro.remove_pad_sequences(trainX)
-trainY = tl.prepro.remove_pad_sequences(trainY)
-testX = tl.prepro.remove_pad_sequences(testX)
-testY = tl.prepro.remove_pad_sequences(testY)
-validX = tl.prepro.remove_pad_sequences(validX)
-validY = tl.prepro.remove_pad_sequences(validY)
-
-trainX[0]
-
-# parameters
-xseq_len = len(trainX)
-yseq_len = len(trainY)
 
 emb_dim = 512
 batch_size = 256
-n_step = int(xseq_len / batch_size)
 xvocab_size = yvocab_size = len(idx2w)
 
 unk_id = w2idx['unk']  # 1
@@ -60,18 +37,22 @@ print("Vocab preprocessing done")
 
 os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
+import model
 print("Start testing")
 
 seq2seq = model.Model(w2idx, idx2w, True)
 sess = seq2seq.restore()
+#seq2seq.train(trainX, trainY)
 questions = [
-    'что думаешь об nlp',
+    'что думаешь об nlp', 
     'кем ты работаешь',
     'какой сегодня день'
 ]
 answers = seq2seq.predict(sess, questions)
-for q, a in zip(questions, answers):
+new_answers = [seq2seq.predict_one(sess, q) for q in questions]
+
+for q, a, new_a in zip(questions, answers, new_answers):
     print(q)
     print(">", " ".join(a))
-
+    print(">", " ".join(new_a))
 

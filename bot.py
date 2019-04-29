@@ -15,7 +15,7 @@ def echo(bot, update):
     print('Conversation query:', query)
     query = ''.join([c for c in query.lower() if c in WHITELIST])
     query = ' '.join(query.split(' ')[:data.limit['maxq']])
-    reply_ar = seq2seq.predict(sess, [query])[0]
+    reply_ar = seq2seq.predict_one(sess, query)
     reply = []
     for w in reply_ar:
         if w == 'end_id':

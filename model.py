@@ -148,7 +148,37 @@ class Model:
         for idx, q in enumerate(questions):
             answers.append([self.inv_vocab[np.argmax(word[idx])] for word in answer])
         return answers
-        
+
+    def predict_one(self, sess, question):
+        enc_inputs = tl.prepro.pad_sequences(
+                [[self.vocab.get(w, self.vocab['unk']) for w in question.split()]], maxlen=self.max_sen_len, padding='pre')[0]
+
+        feed_dict = {}
+        feed_dict[self.forward_only] = True
+        for i in range(self.max_sen_len):
+            feed_dict[self.encoder_inputs[i]] = [enc_inputs[i]]
+
+        answer = [self.vocab['start_id']]
+
+        freedom = 3
+        while True:
+            cur_idx = len(answer)
+            for i in range(cur_idx):
+                feed_dict[self.decoder_inputs[i]] = [answer[i]]
+            for i in range(cur_idx, self.max_sen_len + 2):
+                feed_dict[self.decoder_inputs[i]] = [0] 
+
+            pred_ans = sess.run(self.outputs, feed_dict=feed_dict)
+            cur_word_probas = pred_ans[cur_idx - 1][0]
+
+            cur_word = np.random.choice(
+                    np.argsort(cur_word_probas)[-freedom:])
+            freedom = max(1, freedom - 1)
+
+            answer.append(cur_word)
+            if cur_word == self.vocab['end_id']:
+                break
+        return [self.inv_vocab[word] for word in answer[1:]]
 
 
     def restore(self):
